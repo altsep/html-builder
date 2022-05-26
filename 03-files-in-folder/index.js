@@ -17,6 +17,7 @@ const f = (dir) => {
       list.forEach((item) => {
         const ITEM_PATH = path.join(dir, item.name);
         if (item.isDirectory()) {
+          // make function recursive
           // f(ITEM_PATH);
           return;
         } else {
@@ -27,7 +28,7 @@ const f = (dir) => {
               const ext = path.extname(ITEM_PATH);
               const basename = path.basename(ITEM_PATH, ext);
               console.log(
-                basename + (ext && ' - ' + ext) + ' - ' + stats.size + ' bytes'
+                basename + (ext && ' - ' + ext.replace('.', '')) + ' - ' + stats.size + ' bytes'
               );
               result.push(item.name);
             }
