@@ -1,42 +1,33 @@
-const fs = require('fs');
+const fsPromises = require('fs/promises');
 const path = require('path');
 
 const SECRET_FOLDER_PATH = path.join(__dirname, 'secret-folder');
 
-const f = (dir) => {
-  let result = [];
-  fs.readdir(
-    dir,
-    {
-      withFileTypes: true,
-    },
-    (err, list) => {
-      if (err) {
-        throw new Error(err);
+const findRecursively = async (dir) => {
+  try {
+    const files = await fsPromises.readdir(dir, { withFileTypes: true });
+    
+    files.forEach(async (item) => {
+      const ITEM_PATH = path.join(dir, item.name);
+      if (item.isDirectory()) {
+        // findRecursively(ITEM_PATH);
+        return;
+      } else {
+        const stats = await fsPromises.stat(ITEM_PATH);
+        const ext = path.extname(ITEM_PATH);
+        const basename = path.basename(ITEM_PATH, ext);
+        const output =
+          basename +
+          (ext && ' - ' + ext.slice(1)) +
+          ' - ' +
+          stats.size +
+          ' bytes';
+        console.log(output);
       }
-      list.forEach((item) => {
-        const ITEM_PATH = path.join(dir, item.name);
-        if (item.isDirectory()) {
-          // make function recursive
-          // f(ITEM_PATH);
-          return;
-        } else {
-          fs.stat(ITEM_PATH, (err, stats) => {
-            if (err) {
-              throw new Error(err);
-            } else {
-              const ext = path.extname(ITEM_PATH);
-              const basename = path.basename(ITEM_PATH, ext);
-              console.log(
-                basename + (ext && ' - ' + ext.replace('.', '')) + ' - ' + stats.size + ' bytes'
-              );
-              result.push(item.name);
-            }
-          });
-        }
-      });
-    }
-  );
+    });
+  } catch (err) {
+    if (err) throw err;
+  }
 };
 
-f(SECRET_FOLDER_PATH);
+findRecursively(SECRET_FOLDER_PATH);

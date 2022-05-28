@@ -19,8 +19,11 @@ fs.readdir(STYLES_DIR, { withFileTypes: true }, (err, list) => {
   list.forEach((item) => {
     const ext = path.extname(item.name);
     if (item.isDirectory() || ext !== '.css') return;
-    const FILE = path.join(STYLES_DIR, item.name);
-    const readStream = fs.createReadStream(FILE, { encoding: 'utf8' });
-    readStream.pipe(myTransform).pipe(writeStream);
+    const FILE_PATH = path.join(STYLES_DIR, item.name);
+    const readStream = fs.createReadStream(FILE_PATH, { encoding: 'utf8' });
+    // readStream.pipe(myTransform).pipe(writeStream);
+    stream.pipeline(readStream, myTransform, writeStream, (err) => {
+      if (err) throw err;
+    });
   });
 });

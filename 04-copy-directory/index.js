@@ -27,9 +27,9 @@ fs.access(DIR_COPY_PATH, (err) => {
         if (item.isDirectory()) return;
         const FILE_PATH = path.join(DIR_PATH, item.name);
         const FILE_COPY_PATH = path.join(DIR_COPY_PATH, item.name);
-        fs.copyFile(FILE_PATH, FILE_COPY_PATH, (err) => {
-          if (err) throw err;
-        });
+        const readStream = fs.createReadStream(FILE_PATH);
+        const writeStream = fs.createWriteStream(FILE_COPY_PATH);
+        readStream.pipe(writeStream);
       });
     });
   });

@@ -30,16 +30,19 @@ const makeHtml = async () => {
 
 const copyFolder = async (dir, outputDir) => {
   const items = await fsPromises.readdir(dir, { withFileTypes: true });
+
   items.forEach(async (item) => {
     const { name } = item;
     const ITEM_PATH = path.join(dir, name);
     const CURRENT_DIR_NAME = path.basename(path.dirname(ITEM_PATH));
     const OUTPUT_DIR = path.join(outputDir, CURRENT_DIR_NAME);
     const OUTPUT_FILE = path.join(OUTPUT_DIR, name);
+
     if (item.isDirectory()) {
       copyFolder(ITEM_PATH, OUTPUT_DIR);
       return;
     }
+
     await fsPromises.mkdir(OUTPUT_DIR, { recursive: true });
     const readStream = fs.createReadStream(ITEM_PATH);
     const writeStream = fs.createWriteStream(OUTPUT_FILE);
@@ -53,10 +56,13 @@ const makeStyles = async () => {
   const items = await fsPromises.readdir(STYLES_DIR, { withFileTypes: true });
   const OUTPUT = path.join(DIST_DIR, 'style.css');
   const writeStream = fs.createWriteStream(OUTPUT);
+
   items.forEach((item) => {
     const { name } = item;
     const ext = path.extname(name);
+
     if (item.isDirectory() || ext !== '.css') return;
+    
     const FILE = path.join(STYLES_DIR, name);
     const readStream = fs.createReadStream(FILE, {
       encoding: 'utf8',
@@ -69,11 +75,8 @@ const ASSETS_DIR = path.join(__dirname, 'assets');
 
 const bundleFiles = async (dist, assets) => {
   await cleanDir(dist);
-
   await makeHtml();
-
   await makeStyles();
-
   await copyFolder(assets, dist);
 };
 
