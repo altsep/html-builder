@@ -4,8 +4,8 @@ const stream = require('stream');
 
 const myTransform = new stream.Transform({
   transform(chunk, encoding, callback) {
-    // /* remove spaces */
-    // const data = chunk.toString().replace(/(?<=,|{|;|}|\))\s+/g, '');
+    /* remove spaces */
+    const data = chunk.toString().replace(/(?<=,|{|;|}|\))\s+/g, '');
     callback(null, /* data */ chunk);
   },
 });
@@ -22,7 +22,7 @@ fs.readdir(STYLES_DIR, { withFileTypes: true }, (err, list) => {
     const FILE_PATH = path.join(STYLES_DIR, item.name);
     const readStream = fs.createReadStream(FILE_PATH, { encoding: 'utf8' });
     // readStream.pipe(myTransform).pipe(writeStream);
-    stream.pipeline(readStream, myTransform, writeStream, (err) => {
+    stream.pipeline(readStream, writeStream, (err) => {
       if (err) throw err;
     });
   });
